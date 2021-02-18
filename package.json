@@ -1,0 +1,29 @@
+{
+	"name": "transformat",
+	"version": "0.0.1",
+	"description": "Experimental project to provide a markup to parse and transpile any kind of text",
+	"main": "build/index.js",
+	"scripts": {
+		"test": "eslint .",
+		"start": "tsc && node build/index.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/romdotdog/transformat.git"
+	},
+	"author": "",
+	"license": "Apache-2.0",
+	"bugs": {
+		"url": "https://github.com/romdotdog/transformat/issues"
+	},
+	"homepage": "https://github.com/romdotdog/transformat#readme",
+	"devDependencies": {
+		"@typescript-eslint/eslint-plugin": "^4.15.1",
+		"@typescript-eslint/parser": "^4.15.1",
+		"eslint": "^7.20.0",
+		"prettier": "2.2.1"
+	},
+	"dependencies": {
+		"typescript": "^4.1.5"
+	}
+}
