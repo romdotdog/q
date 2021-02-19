@@ -1,6 +1,6 @@
 import { cac } from "cac"
 import { readFile } from "fs/promises"
-import { lex } from "./tr/lex"
+import { parse } from "./tr/parse"
 
 const cli = cac("transformat")
 cli
@@ -9,7 +9,13 @@ cli
 		"transform [file] or stdin using <transformat>"
 	)
 	.action(async (transformat: string, file) => {
-		console.log(lex(await readFile(transformat, { encoding: "utf-8" })))
+		console.log(
+			JSON.stringify(
+				parse(await readFile(transformat, { encoding: "utf-8" })),
+				null,
+				4
+			)
+		)
 
 		//const str = await readFile(file || process.stdin.fd)
 		//process.stdout.write()

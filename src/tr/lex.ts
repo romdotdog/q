@@ -5,14 +5,13 @@ export function lex(input: string): Token[] {
 
 	let p = 0
 
-	let line = 0
+	let line = 1
 	let col = 0
 
 	const tokenBuffer: Token[] = []
 	const length = input.length
 
 	function panic(msg: string): never {
-		const text = input.substring(0, p)
 		console.log(tokenBuffer)
 		throw new Error(`file<${line}:${col}>: ${msg}`)
 	}
@@ -94,17 +93,19 @@ export function lex(input: string): Token[] {
 		}
 	})
 
-	registerToken(/\+/, () => {
+	registerToken(/\+/, ([value]) => {
 		return {
 			type: TokenType.Plus,
-			debugInfo: [line, col]
+			debugInfo: [line, col],
+			value
 		}
 	})
 
-	registerToken(/\|/, () => {
+	registerToken(/\|/, ([value]) => {
 		return {
 			type: TokenType.Or,
-			debugInfo: [line, col]
+			debugInfo: [line, col],
+			value
 		}
 	})
 
@@ -141,18 +142,12 @@ export function lex(input: string): Token[] {
 		for (const [regex, callback] of callbacks) {
 			const m = nextChars.match(regex)
 			if (m) {
-				const whiteLength = m[0].length
-				const lastNewlineIndex = m[0].lastIndexOf("\n")
+				const l = m[0].length
+				p += l
 
-				if (lastNewlineIndex) {
-					line += m[0].split("\n").length - 1
-					col = lastNewlineIndex
-				} else {
-					col += whiteLength
-				}
-
-				p += whiteLength
-				return callback(m)
+				const r = callback(m)
+				col += l
+				return r
 			}
 		}
 
@@ -169,7 +164,17 @@ export function lex(input: string): Token[] {
 			.match(/^(?:\s*(?:\/\/.*?(?:\n|$))*)*/)
 
 		if (leadingWhitespace) {
-			p += leadingWhitespace[0].length
+			const whiteLength = leadingWhitespace[0].length
+			const lastNewlineIndex = leadingWhitespace[0].lastIndexOf("\n")
+
+			if (lastNewlineIndex != -1) {
+				line += leadingWhitespace[0].split("\n").length - 1
+				col = whiteLength - lastNewlineIndex
+			} else {
+				col += whiteLength
+			}
+
+			p += whiteLength
 		}
 
 		tokenBuffer.push(getToken())

@@ -3,15 +3,27 @@ import unescape from "unescape-js"
 
 class Base {}
 
-class Expression extends Base {}
-class Statement extends Base {}
+export class Expression extends Base {}
+export class Statement extends Base {}
 
 // This is generally a small AST that can fit into one file
+
+export class IdentifierLiteral extends Expression {
+	value: string
+	nested: boolean
+
+	constructor(token: TokenLiteral) {
+		super()
+
+		this.nested = token.type == TokenType.NestedIdentifier
+		this.value = token.value
+	}
+}
 
 export class StringLiteral extends Expression {
 	value: string
 
-	constructor(token: TokenLiteral & { type: TokenType.String }) {
+	constructor(token: TokenLiteral) {
 		super()
 		this.value = unescape(token.value)
 	}
@@ -20,7 +32,7 @@ export class StringLiteral extends Expression {
 export class RegExLiteral extends Expression {
 	value: RegExp
 
-	constructor(token: TokenRegEx & { type: TokenType.RegEx }) {
+	constructor(token: TokenRegEx) {
 		super()
 		this.value = new RegExp(token.source, token.flags)
 	}
@@ -38,14 +50,18 @@ export class Parenthesis extends Expression {
 }
 
 export class BinOp extends Expression {
-	constructor(public lhs: Expression, public rhs: Expression) {
+	constructor(
+		public lhs: Expression,
+		public op: string,
+		public rhs: Expression
+	) {
 		super()
 	}
 }
 
 // End Expressions
 
-export type Block = [Record<string, Node>, Error?]
+export type Block = [[string, Node][], ErrorStat?]
 
 export class Node extends Statement {
 	constructor(public expr: Expression, public block?: Block) {
@@ -56,7 +72,7 @@ export class Node extends Statement {
 export class ErrorStat extends Statement {
 	value: string
 
-	constructor(token: TokenLiteral & { type: TokenType.Error }) {
+	constructor(token: TokenLiteral) {
 		super()
 		this.value = unescape(token.value)
 	}

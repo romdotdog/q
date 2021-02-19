@@ -3,7 +3,12 @@ module.exports = {
 		es2021: true,
 		node: true
 	},
-	extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
+	extends: [
+		"eslint:recommended",
+		"plugin:@typescript-eslint/recommended",
+		"prettier",
+		"prettier/@typescript-eslint"
+	],
 	parser: "@typescript-eslint/parser",
 	parserOptions: {
 		ecmaVersion: 12,
@@ -11,7 +16,6 @@ module.exports = {
 	},
 	plugins: ["@typescript-eslint"],
 	rules: {
-		indent: ["error", "tab"],
 		"linebreak-style": ["error", "windows"],
 		quotes: ["error", "double"],
 		semi: ["error", "never"]
