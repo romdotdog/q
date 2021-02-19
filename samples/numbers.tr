@@ -21,7 +21,7 @@ lex: /\s*/ {
 }
 
 parse: $Expression {
-    ; going down -> top
+    // going top -> bottom
 
     Expression: $O2 + ((Eq | Neq) + $O2)* {
         O2: $O1 + ((Add | Sub) + $O1)* {

@@ -1,8 +1,11 @@
 import { Token, TokenType } from "./Token"
 
 export function lex(input: string): Token[] {
+	input = input.replace(/\r\n/g, "\n")
+
 	let p = 0
 	const tokenBuffer: Token[] = []
+	const length = input.length
 
 	function panic(msg: string): never {
 		const text = input.substring(0, p)
@@ -57,7 +60,7 @@ export function lex(input: string): Token[] {
 		}
 	})
 
-	registerToken(/\[(.*?(?<!\\)(?:\\\\)*(?!\\))\]/, ([, value]) => {
+	registerToken(/\[\s*(.*?(?<!\\)(?:\\\\)*(?!\\))\]/, ([, value]) => {
 		return {
 			type: TokenType.Error,
 			value: value.trim()
@@ -119,13 +122,14 @@ export function lex(input: string): Token[] {
 		for (const [regex, callback] of callbacks) {
 			const m = nextChars.match(regex)
 			if (m) {
+				p += m[0].length
 				return callback(m)
 			}
 		}
 
 		panic(
 			"trlex -> Unexpected token. Next 10 characters: " +
-				`\`${input.substring(p, p + 10)}\``
+				`\`${input.substring(p, p + 10).replace(/\n/g, "\\n")}\``
 		)
 	}
 
