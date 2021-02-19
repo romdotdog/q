@@ -1,4 +1,4 @@
-import Block from "transformat"
+import Block from "./Block"
 import { GenericToken } from "./types/GenericAST"
 
 function escapeRegExp(str: string): string {

@@ -9,7 +9,7 @@ import {
 } from "./AST"
 
 const BinOpPriority: Record<string, number> = {
-	"->": 0,
+	"->": 2,
 	"|": 1
 }
 
@@ -51,7 +51,7 @@ function parse(input: string): Pattern {
 
 	function panic(msg: string): never {
 		const tk = peek()
-		throw new Error(`ptprs -> ${msg}. ${tk.toString()}`)
+		throw new Error(`ptprs \`${input}\` -> ${msg}.`)
 	}
 
 	// eslint-disable-next-line prefer-const
@@ -69,7 +69,7 @@ function parse(input: string): Pattern {
 				const closeParen = get()
 
 				if (closeParen.type !== TokenType.CloseParen) {
-					panic("Expected closing parenthesis.")
+					panic(`Expected closing parenthesis, got ${closeParen.source}`)
 				}
 
 				let range: [number, number?] = [1, 1]
@@ -116,6 +116,7 @@ function parse(input: string): Pattern {
 
 			lhs = new BinOp(lhs, lookahead.source, rhs)
 		}
+
 		return lhs
 	}
 

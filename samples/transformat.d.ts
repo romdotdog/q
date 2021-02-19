@@ -26,7 +26,7 @@ declare module "transformat" {
 		/**
 		 * The main pattern the entire file consists of.
 		 */
-		main: Pattern
+		root: Pattern
 
 		/**
 		 * AST specification.
@@ -44,29 +44,58 @@ declare module "transformat" {
 		...placeholders: string[]
 	): Pattern
 
-	export class Pattern {}
+	export class IdentifierManager {
+		private lexIdents: Set<string>
+		private idents: Record<string, Pattern> = {}
+
+		constructor(lexIdents: string[])
+
+		isLex(ident: string): boolean
+		add(ident: string, pattern: Pattern): void
+		get(ident: string): Pattern | undefined
+	}
+
+	//
+
+	export interface GenericToken {
+		type: string
+		source: [string, ...string[]]
+		debugInfo: [line: number, col: number]
+	}
+
+	export interface GenericSyntax {
+		source: GenericToken[]
+		groups: GenericSyntax[]
+	}
+
+	export interface NamedGenericSyntax extends GenericSyntax {
+		type: string
+	}
+
+	export abstract class Pattern {
+		abstract try(
+			tokenStream: GenericToken[],
+			identManager: IdentifierManager,
+			syntax: GenericSyntax
+		): boolean
+
+		abstract print(): string
+	}
 
 	export class IdentifierLiteral extends Pattern {
 		value: string
 
-		constructor(tk: Token) {
-			super()
-			this.value = tk.source
-		}
+		constructor(tk: Token)
 	}
 
 	export class Parenthesis extends Pattern {
 		constructor(
 			public expr: Pattern,
 			public range: [start: number, end?: number]
-		) {
-			super()
-		}
+		)
 	}
 
 	export class BinOp extends Pattern {
-		constructor(public lhs: Pattern, public op: string, public rhs: Pattern) {
-			super()
-		}
+		constructor(public lhs: Pattern, public op: string, public rhs: Pattern)
 	}
 }

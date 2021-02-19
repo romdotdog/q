@@ -1,3 +1,4 @@
+import { IdentifierManager } from "../gen/identManager"
 import { GenericSyntax, GenericToken } from "../gen/types/GenericAST"
 
 export enum TokenType {
@@ -20,6 +21,8 @@ export abstract class Pattern {
 		identManager: IdentifierManager,
 		syntax: GenericSyntax
 	): boolean
+
+	abstract print(): string
 }
 
 export class IdentifierLiteral extends Pattern {
@@ -28,6 +31,10 @@ export class IdentifierLiteral extends Pattern {
 	constructor(tk: Token) {
 		super()
 		this.value = tk.source
+	}
+
+	print(): string {
+		return this.value
 	}
 
 	try(
@@ -43,7 +50,7 @@ export class IdentifierLiteral extends Pattern {
 			}
 			return false
 		} else {
-			const pattern: Pattern = identManager.get(this.value)
+			const pattern = identManager.get(this.value)
 			if (pattern) {
 				return pattern.try(tokenStream, identManager, syntax)
 			} else {
@@ -61,6 +68,10 @@ export class Parenthesis extends Pattern {
 		super()
 	}
 
+	print(): string {
+		return `(${this.expr.print()})`
+	}
+
 	try(
 		tokenStream: GenericToken[],
 		identManager: IdentifierManager,
@@ -73,6 +84,10 @@ export class Parenthesis extends Pattern {
 export class Group extends Pattern {
 	constructor(public expr: Pattern) {
 		super()
+	}
+
+	print(): string {
+		return `<${this.expr.print()}>`
 	}
 
 	try(
@@ -99,6 +114,10 @@ export class BinOp extends Pattern {
 		super()
 	}
 
+	print(): string {
+		return `${this.lhs.print()} ${this.op} ${this.rhs.print()}`
+	}
+
 	try(
 		tokenStream: GenericToken[],
 		identManager: IdentifierManager,
@@ -111,7 +130,7 @@ export class BinOp extends Pattern {
 					this.rhs.try(tokenStream, identManager, syntax)
 				)
 			case "|": {
-				// tries both on separate token streams, tries the one that succeeds ltr
+				// tries both on separate token streams, tries the one that succeeds
 				let newStream: GenericToken[]
 				const lhsStream = tokenStream.slice()
 				const rhsStream = tokenStream.slice()

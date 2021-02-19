@@ -1,8 +1,6 @@
-type OneOrMore<T> = [T, ...T[]]
-
 export interface GenericToken {
 	type: string
-	source: OneOrMore<string>
+	source: [string, ...string[]]
 	debugInfo: [line: number, col: number]
 }
 

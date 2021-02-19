@@ -25,23 +25,23 @@ export default <Block>{
 	},
 
 	parse: {
-		main: pattern`Expression`,
+		root: pattern`expression`,
 		ast: {
-			PrimaryExpression: pattern`Number | Sub -> Number | OpeningParenthesis -> $Expression -> ClosingParenthesis`,
-			O1: pattern`<PrimaryExpression> -> <Mul | Div> -> <PrimaryExpression>`,
-			Expression: pattern`O1 | PrimaryExpression`
+			primaryExpression: pattern`number | sub -> number | openingParenthesis -> expression -> closingParenthesis`,
+			o1: pattern`<primaryExpression> -> <(mul | div)> -> <primaryExpression>`,
+			expression: pattern`o1 | primaryExpression`
 		}
 	}
 }
 
 /*
-parse: $Expression {
+parse: $expression {
     // going top -> bottom
 
-    Expression: $O2 + ((Eq | Neq) + $O2)* {
-        O2: $O1 + ((Add | Sub) + $O1)* {
-            O1: $Primary + ((Mul | Div) + $Primary)* {
-                Primary: Number | Sub + Number | OpeningParenthesis + Expression + ClosingParenthesis;
+    expression: $O2 + ((Eq | Neq) + $O2)* {
+        O2: $o1 + ((Add | sub) + $o1)* {
+            o1: $Primary + ((mul | div) + $Primary)* {
+                Primary: number | sub + number | openingParenthesis + expression + closingParenthesis;
             }
         }
     }
