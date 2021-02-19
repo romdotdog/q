@@ -45,7 +45,6 @@ export class IdentifierLiteral extends Pattern {
 		if (identManager.isLex(this.value)) {
 			const [next] = tokenStream.splice(0, 1)
 			if (next.type == this.value) {
-				syntax.source.push(next)
 				return true
 			}
 			return false
@@ -96,7 +95,6 @@ export class Group extends Pattern {
 		syntax: GenericSyntax
 	): boolean {
 		const nestedSyntax: GenericSyntax = {
-			source: [],
 			groups: []
 		}
 

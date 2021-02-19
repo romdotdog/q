@@ -36,7 +36,9 @@ cli
 			: await read(process.stdin)
 
 		const tokenStream = buildLexer(Block.default)(str)
-		console.log(buildParser(Block.default)(tokenStream))
+		console.log(
+			JSON.stringify(buildParser(Block.default)(tokenStream), null, 4)
+		)
 	})
 
 cli.parse()

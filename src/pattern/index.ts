@@ -50,7 +50,6 @@ function parse(input: string): Pattern {
 	const peek = (n = 0) => tokenStream[p + n]
 
 	function panic(msg: string): never {
-		const tk = peek()
 		throw new Error(`ptprs \`${input}\` -> ${msg}.`)
 	}
 
