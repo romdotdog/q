@@ -1,25 +1,31 @@
 // ext: .n
+import Block from "transformat"
 
-lex: /\s*/ {
-    Number: /\d+|\d*\.\d+/;
+export default <Block>{
+	lex: {
+		whitespaceRegEx: /\s*/,
 
-    // symbols
-    OpeningParenthesis: "(";
-    ClosingParenthesis: ")";
+		tokens: [
+			["number", /\d+|\d*\.\d+/],
+			["openingParenthesis", "("],
+			["closingParenthesis", ")"],
 
-    // ops
-    Eq: "==";
-    Neq: "!=";
+			// ops
+			["eq", "=="],
+			["neq", "!="],
 
-    Add: "+";
-    Sub: "-";
+			["add", "+"],
+			["sub", "-"],
 
-    Mul: "*";
-    Div: "/";
+			["mul", "*"],
+			["div", "/"]
+		],
 
-    [ Halted at lexer: Unexpected token. ]
+		throw: "Halted at lexer: Unexpected token."
+	}
 }
 
+/*
 parse: $Expression {
     // going top -> bottom
 
@@ -33,3 +39,4 @@ parse: $Expression {
 
     [ Malformed expression. ]
 }
+*/

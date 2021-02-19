@@ -1,36 +1,20 @@
+import Block from "transformat"
 import { GenericToken } from "./types/GenericToken"
-import { Block, RegExLiteral, StringLiteral } from "../tr/types/AST"
 
 function escapeRegExp(str: string): string {
 	return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") // $& means the whole matched string
 }
 
 export function buildLex(root: Block): (input: string) => GenericToken[] {
-	const _lex = root[0].find(([field]) => field == "lex")
-	if (!_lex) {
-		throw new Error("Expected `lex` field in root block.")
-	}
-
-	const [, lex] = _lex
-
-	const whitespaceExpr = lex.expr
-	if (!(whitespaceExpr instanceof RegExLiteral)) {
-		throw new Error("Expected `lex` field expression to be a RegEx.")
-	}
-
-	if (!lex.block) {
-		throw new Error("Expected `lex` field to have a block.")
-	}
-
-	const whitespaceRegEx = whitespaceExpr.value
+	const lex = root.lex
+	const whitespaceRegEx = lex.whitespaceRegEx
 
 	const tokenTypes: [name: string, matcher: RegExp][] = []
-	for (const [name, { expr }] of lex.block[0]) {
-		if (expr instanceof RegExLiteral) {
-			const { value } = expr
-			tokenTypes.push([name, new RegExp(`^(?:${value.source})`, value.flags)])
-		} else if (expr instanceof StringLiteral) {
-			tokenTypes.push([name, new RegExp(`^(?:${escapeRegExp(expr.value)})`)])
+	for (const [name, expr] of lex.tokens) {
+		if (expr instanceof RegExp) {
+			tokenTypes.push([name, new RegExp(`^(?:${expr.source})`, expr.flags)])
+		} else if (typeof expr === "string") {
+			tokenTypes.push([name, new RegExp(`^(?:${escapeRegExp(expr)})`)])
 		} else {
 			throw new Error(
 				`Invalid expression for lexer in field \`${name}\`, expected RegEx or String.`
@@ -62,9 +46,10 @@ export function buildLex(root: Block): (input: string) => GenericToken[] {
 					const l = m[0].length
 					p += l
 
+					const [m0, ...rm] = [...m]
 					const r: GenericToken = {
 						type: name,
-						source: m[0],
+						source: [m0, ...rm],
 						debugInfo: [line, col]
 					}
 					col += l
@@ -74,31 +59,33 @@ export function buildLex(root: Block): (input: string) => GenericToken[] {
 
 			panic(
 				`${
-					lex.block?.[1]?.value || "built lexer => Unexpected token."
+					lex.throw || "built lexer => Unexpected token."
 				} Next 10 characters: ` +
 					`\`${input.substring(p, p + 10).replace(/\n/g, "\\n")}\``
 			)
 		}
 
 		while (p < length) {
-			const leadingWhitespace = input.substring(p).match(whitespaceRegEx)
+			if (whitespaceRegEx) {
+				const leadingWhitespace = input.substring(p).match(whitespaceRegEx)
 
-			if (leadingWhitespace) {
-				const whiteLength = leadingWhitespace[0].length
-				const lastNewlineIndex = leadingWhitespace[0].lastIndexOf("\n")
+				if (leadingWhitespace) {
+					const whiteLength = leadingWhitespace[0].length
+					const lastNewlineIndex = leadingWhitespace[0].lastIndexOf("\n")
 
-				if (lastNewlineIndex != -1) {
-					line += leadingWhitespace[0].split("\n").length - 1
-					col = whiteLength - lastNewlineIndex
-				} else {
-					col += whiteLength
+					if (lastNewlineIndex != -1) {
+						line += leadingWhitespace[0].split("\n").length - 1
+						col = whiteLength - lastNewlineIndex
+					} else {
+						col += whiteLength
+					}
+
+					p += whiteLength
 				}
-
-				p += whiteLength
 			}
 
 			const tk = getToken()
-			if (tk.source == "") {
+			if (tk.source[0] == "") {
 				throw new Error(
 					`built lexer => Encountered infinite regex loop at \`${tk.type}\``
 				)

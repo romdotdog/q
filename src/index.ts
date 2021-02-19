@@ -1,7 +1,8 @@
 import { cac } from "cac"
 import { readFile } from "fs/promises"
 import { buildLex } from "./gen/lex"
-import { parse } from "./tr/parse"
+import requireFromString from "require-from-string"
+import * as ts from "typescript"
 
 // https://stackoverflow.com/questions/30441025/read-all-text-from-stdin-to-a-string
 async function read(stream: NodeJS.ReadStream) {
@@ -17,13 +18,22 @@ cli
 		"transform [file] or stdin using <transformat>"
 	)
 	.action(async (transformat: string, file?: string) => {
-		const root = parse(await readFile(transformat, { encoding: "utf-8" }))
+		const Block = requireFromString(
+			ts.transpile(await readFile(transformat, { encoding: "utf-8" }))
+		)
+
+		console.assert(
+			Block.default,
+			"Expected `Block` as default export in transformat."
+		)
+
+		console.log(file)
 
 		const str = file
 			? await readFile(file, { encoding: "utf8" })
 			: await read(process.stdin)
 
-		console.log(buildLex(root)(str))
+		console.log(buildLex(Block.default)(str))
 	})
 
 cli.parse()
