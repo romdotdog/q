@@ -1,4 +1,4 @@
-import { match } from "assert"
+import { GenericToken } from "./types/GenericToken"
 import { Block, RegExLiteral, StringLiteral } from "../tr/types/AST"
 
 function escapeRegExp(str: string): string {
