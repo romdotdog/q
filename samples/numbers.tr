@@ -1,0 +1,35 @@
+// ext: .n
+
+lex: /\s*/ {
+    Number: /\d+|\d*(?:\.\d*)?/;
+
+    // symbols
+    OpeningParenthesis: "(";
+    ClosingParenthesis: ")";
+
+    // ops
+    Eq: "==";
+    Neq: "!=";
+
+    Add: "+";
+    Sub: "-";
+
+    Mul: "*";
+    Div: "/";
+
+    [ Halted at lexer: Unexpected token. ]
+}
+
+parse: $Expression {
+    ; going down -> top
+
+    Expression: $O2 + ((Eq | Neq) + $O2)* {
+        O2: $O1 + ((Add | Sub) + $O1)* {
+            O1: $Primary + ((Mul | Div) + $Primary)* {
+                Primary: Number | Sub + Number | OpeningParenthesis + Expression + ClosingParenthesis;
+            }
+        }
+    }
+
+    [ Malformed expression ]
+}
