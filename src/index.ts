@@ -36,13 +36,7 @@ cli
 			: await read(process.stdin)
 
 		const tokenStream = buildLexer(Block.default)(str)
-		console.log(
-			JSON.stringify(
-				buildParser(Block.default)(tokenStream),
-				(_, a) => (a.debugInfo ? a.source : a),
-				4
-			)
-		)
+		const tree = buildParser(Block.default)(tokenStream)
 	})
 
 cli.parse()

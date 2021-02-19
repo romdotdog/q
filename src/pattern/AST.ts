@@ -1,5 +1,9 @@
 import { IdentifierManager } from "../gen/identManager"
-import { GenericSyntax, GenericToken } from "../gen/types/GenericAST"
+import {
+	GenericSyntax,
+	GenericToken,
+	NamedGenericSyntax
+} from "../gen/types/GenericAST"
 
 export enum TokenType {
 	Identifier,
@@ -52,7 +56,18 @@ export class IdentifierLiteral extends Pattern {
 		} else {
 			const pattern = identManager.get(this.value)
 			if (pattern) {
-				return pattern.try(tokenStream, identManager, syntax)
+				const namedSyntax: NamedGenericSyntax = {
+					type: this.value,
+					groups: [],
+					source: []
+				}
+
+				const success = pattern.try(tokenStream, identManager, namedSyntax)
+				if (success) {
+					syntax.source.push(namedSyntax)
+					return true
+				}
+				return false
 			} else {
 				throw new Error(`Identifier \`${this.value}\` not found.`)
 			}
@@ -103,6 +118,7 @@ export class Group extends Pattern {
 		const success = this.expr.try(tokenStream, identManager, nestedSyntax)
 		if (success) {
 			syntax.groups.push(nestedSyntax)
+			syntax.source.push(nestedSyntax)
 			return true
 		}
 		return false
