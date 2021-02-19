@@ -1,5 +1,5 @@
 import Block from "transformat"
-import { GenericToken } from "./types/GenericToken"
+import { GenericToken } from "./types/GenericAST"
 
 function escapeRegExp(str: string): string {
 	return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") // $& means the whole matched string
@@ -10,7 +10,16 @@ export function buildLex(root: Block): (input: string) => GenericToken[] {
 	const whitespaceRegEx = lex.whitespaceRegEx
 
 	const tokenTypes: [name: string, matcher: RegExp][] = []
-	for (const [name, expr] of lex.tokens) {
+	for (const _name of Reflect.ownKeys(lex.tokens)) {
+		// integer names throw off chronological object ordering
+		const name = _name.toString()
+		if (!isNaN(parseInt(name.toString()))) {
+			throw new Error(
+				`Integer name \`${name.toString()}\` in lexer is not allowed.`
+			)
+		}
+
+		const expr = lex.tokens[name]
 		if (expr instanceof RegExp) {
 			tokenTypes.push([name, new RegExp(`^(?:${expr.source})`, expr.flags)])
 		} else if (typeof expr === "string") {

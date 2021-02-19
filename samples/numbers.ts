@@ -1,27 +1,36 @@
 // ext: .n
-import Block from "transformat"
+import Block, { pattern } from "transformat"
 
 export default <Block>{
 	lex: {
 		whitespaceRegEx: /\s*/,
 
-		tokens: [
-			["number", /\d+|\d*\.\d+/],
-			["openingParenthesis", "("],
-			["closingParenthesis", ")"],
+		tokens: {
+			number: /\d+|\d*\.\d+/,
+			openingParenthesis: "(",
+			closingParenthesis: ")",
 
 			// ops
-			["eq", "=="],
-			["neq", "!="],
+			eq: "==",
+			neq: "!=",
 
-			["add", "+"],
-			["sub", "-"],
+			add: "+",
+			sub: "-",
 
-			["mul", "*"],
-			["div", "/"]
-		],
+			mul: "*",
+			div: "/"
+		},
 
 		throw: "Halted at lexer: Unexpected token."
+	},
+
+	parse: {
+		main: pattern`Expression`,
+		ast: {
+			PrimaryExpression: pattern`Number | Sub -> Number | OpeningParenthesis -> $Expression -> ClosingParenthesis`,
+			O1: pattern`<PrimaryExpression> -> <Mul | Div> -> <PrimaryExpression>`,
+			Expression: pattern`O1 | PrimaryExpression`
+		}
 	}
 }
 

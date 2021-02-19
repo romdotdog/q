@@ -1,6 +1,7 @@
 import { cac } from "cac"
 import { readFile } from "fs/promises"
 import { buildLex } from "./gen/lex"
+import { join } from "path"
 import requireFromString from "require-from-string"
 import * as ts from "typescript"
 
@@ -19,7 +20,11 @@ cli
 	)
 	.action(async (transformat: string, file?: string) => {
 		const Block = requireFromString(
-			ts.transpile(await readFile(transformat, { encoding: "utf-8" }))
+			ts.transpile(await readFile(transformat, { encoding: "utf-8" })),
+			transformat,
+			{
+				prependPaths: [join(__dirname, "sandbox")]
+			}
 		)
 
 		console.assert(
