@@ -38,8 +38,6 @@ export function buildLex(root: Block): (input: string) => GenericToken[] {
 		}
 	}
 
-	console.log(tokenTypes)
-
 	return (input: string) => {
 		input = input.replace(/\r\n/g, "\n")
 
