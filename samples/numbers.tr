@@ -1,7 +1,7 @@
 // ext: .n
 
 lex: /\s*/ {
-    Number: /\d+|\d*(?:\.\d*)?/;
+    Number: /\d+|\d*\.\d+/;
 
     // symbols
     OpeningParenthesis: "(";
@@ -31,5 +31,5 @@ parse: $Expression {
         }
     }
 
-    [ Malformed expression ]
+    [ Malformed expression. ]
 }
