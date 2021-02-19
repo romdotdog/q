@@ -12,7 +12,7 @@
 		"url": "git+https://github.com/romdotdog/transformat.git"
 	},
 	"author": "",
-	"license": "Apache-2.0",
+	"license": "MIT",
 	"bugs": {
 		"url": "https://github.com/romdotdog/transformat/issues"
 	},
