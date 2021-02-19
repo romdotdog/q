@@ -5,6 +5,7 @@ import { join } from "path"
 import requireFromString from "require-from-string"
 import * as ts from "typescript"
 import { buildParser } from "./gen/parse"
+import { buildGenerator } from "./gen/generate"
 
 // https://stackoverflow.com/questions/30441025/read-all-text-from-stdin-to-a-string
 async function read(stream: NodeJS.ReadStream) {
@@ -36,7 +37,8 @@ cli
 			: await read(process.stdin)
 
 		const tokenStream = buildLexer(Block.default)(str)
-		const tree = buildParser(Block.default)(tokenStream)
+		const ast = buildParser(Block.default)(tokenStream)
+		console.log(buildGenerator(Block.default)(ast))
 	})
 
 cli.parse()

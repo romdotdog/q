@@ -1,4 +1,5 @@
 import { Pattern } from "../pattern/AST"
+import { GenericSyntax } from "./types/GenericAST"
 
 /**
  * This interface provides a specification to tokenize text.
@@ -35,7 +36,22 @@ interface Parser {
 	ast: Record<string, Pattern>
 }
 
+type Visitor = (...groups: GenericSyntax[]) => void
+type Serializer = (...groups: string[]) => string
+
+interface Generator {
+	syntaxes: Record<
+		string,
+		{
+			visit?: Visitor
+			serialize: Serializer
+		}
+	>
+	$joiner?: (accumulator: string, serializedSyntax: string) => string
+}
+
 export default interface Block {
 	lex: Lexer
 	parse: Parser
+	gen: Generator
 }

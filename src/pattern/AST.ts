@@ -41,15 +41,10 @@ export class IdentifierLiteral extends Pattern {
 		return this.value
 	}
 
-	try(
-		tokenStream: GenericToken[],
-		identManager: IdentifierManager,
-		syntax: GenericSyntax
-	): boolean {
+	try(tokenStream: GenericToken[], identManager: IdentifierManager): boolean {
 		if (identManager.isLex(this.value)) {
 			const [next] = tokenStream.splice(0, 1)
 			if (next.type == this.value) {
-				syntax.source.push(next)
 				return true
 			}
 			return false
@@ -58,13 +53,11 @@ export class IdentifierLiteral extends Pattern {
 			if (pattern) {
 				const namedSyntax: NamedGenericSyntax = {
 					type: this.value,
-					groups: [],
-					source: []
+					groups: []
 				}
 
 				const success = pattern.try(tokenStream, identManager, namedSyntax)
 				if (success) {
-					syntax.source.push(namedSyntax)
 					return true
 				}
 				return false
@@ -111,14 +104,12 @@ export class Group extends Pattern {
 		syntax: GenericSyntax
 	): boolean {
 		const nestedSyntax: GenericSyntax = {
-			groups: [],
-			source: []
+			groups: []
 		}
 
 		const success = this.expr.try(tokenStream, identManager, nestedSyntax)
 		if (success) {
 			syntax.groups.push(nestedSyntax)
-			syntax.source.push(nestedSyntax)
 			return true
 		}
 		return false

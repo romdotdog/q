@@ -27,10 +27,14 @@ export default <Block>{
 	parse: {
 		root: pattern`expression`,
 		ast: {
-			primaryExpression: pattern`number | sub -> number | openingParenthesis -> expression -> closingParenthesis`,
+			primaryExpression: pattern`<number | sub -> number | openingParenthesis -> expression -> closingParenthesis>`,
 			o1: pattern`<primaryExpression> -> <(mul | div)> -> <primaryExpression>`,
-			expression: pattern`o1 | primaryExpression`
+			expression: pattern`<o1> | <primaryExpression>`
 		}
+	},
+
+	gen: {
+		syntaxes: {}
 	}
 }
 

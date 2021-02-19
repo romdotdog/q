@@ -34,9 +34,24 @@ declare module "transformat" {
 		ast: Record<string, Pattern>
 	}
 
+	type Visitor = (...groups: GenericSyntax[]) => void
+	type Serializer = (...groups: string[]) => string
+
+	interface Generator {
+		syntaxes: Record<
+			string,
+			{
+				visit?: Visitor
+				serialize: Serializer
+			}
+		>
+		$joiner?: (accumulator: string, serializedSyntax: string) => string
+	}
+
 	export default interface Block {
 		lex: Lexer
 		parse: Parser
+		gen: Generator
 	}
 
 	export function pattern(
@@ -55,8 +70,6 @@ declare module "transformat" {
 		get(ident: string): Pattern | undefined
 	}
 
-	//
-
 	export interface GenericToken {
 		type: string
 		source: [string, ...string[]]
@@ -64,7 +77,6 @@ declare module "transformat" {
 	}
 
 	export interface GenericSyntax {
-		source: GenericToken[]
 		groups: GenericSyntax[]
 	}
 
