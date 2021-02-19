@@ -37,7 +37,11 @@ cli
 
 		const tokenStream = buildLexer(Block.default)(str)
 		console.log(
-			JSON.stringify(buildParser(Block.default)(tokenStream), null, 4)
+			JSON.stringify(
+				buildParser(Block.default)(tokenStream),
+				(_, a) => (a.debugInfo ? a.source : a),
+				4
+			)
 		)
 	})
 

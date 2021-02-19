@@ -8,6 +8,7 @@ export function buildParser(
 	const identManager = new IdentifierManager(Object.keys(root.lex.tokens))
 	const rootSyntax: NamedGenericSyntax = {
 		type: "Root",
+		source: [],
 		groups: []
 	}
 
