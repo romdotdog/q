@@ -23,6 +23,7 @@ export enum TokenType {
 
 export interface Token {
 	type: TokenType
+	debugInfo: [line: number, col: number]
 }
 
 export interface TokenLiteral extends Token {

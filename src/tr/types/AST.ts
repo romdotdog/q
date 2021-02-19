@@ -45,7 +45,7 @@ export class BinOp extends Expression {
 
 // End Expressions
 
-export type Block = Record<string, Node>
+export type Block = [Record<string, Node>, Error?]
 
 export class Node extends Statement {
 	constructor(public expr: Expression, public block?: Block) {

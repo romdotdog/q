@@ -4,16 +4,17 @@ export function lex(input: string): Token[] {
 	input = input.replace(/\r\n/g, "\n")
 
 	let p = 0
+
+	let line = 0
+	let col = 0
+
 	const tokenBuffer: Token[] = []
 	const length = input.length
 
 	function panic(msg: string): never {
 		const text = input.substring(0, p)
-		const line = text.split("\n").length
-		let char = p
-		text.split("\n").forEach((s) => (char -= s.length))
 		console.log(tokenBuffer)
-		throw new Error(`file<${line}:${char}>: ${msg}`)
+		throw new Error(`file<${line}:${col}>: ${msg}`)
 	}
 
 	type TokenCallback = (match: RegExpMatchArray) => Token
@@ -25,6 +26,7 @@ export function lex(input: string): Token[] {
 	registerToken(/([a-zA-Z_]\w*):/, ([, value]) => {
 		return {
 			type: TokenType.Field,
+			debugInfo: [line, col],
 			value
 		}
 	})
@@ -33,6 +35,7 @@ export function lex(input: string): Token[] {
 	registerToken(/\$([a-zA-Z_]\w*)/, ([, value]) => {
 		return {
 			type: TokenType.NestedIdentifier,
+			debugInfo: [line, col],
 			value
 		}
 	})
@@ -41,6 +44,7 @@ export function lex(input: string): Token[] {
 	registerToken(/[a-zA-Z_]\w*/, ([value]) => {
 		return {
 			type: TokenType.Identifier,
+			debugInfo: [line, col],
 			value
 		}
 	})
@@ -51,6 +55,7 @@ export function lex(input: string): Token[] {
 		([, source, flags]) => {
 			return {
 				type: TokenType.RegEx,
+				debugInfo: [line, col],
 				source,
 				flags
 			}
@@ -60,6 +65,7 @@ export function lex(input: string): Token[] {
 	registerToken(/"(.*?(?<!\\)(?:\\\\)*(?!\\))"/, ([, value]) => {
 		return {
 			type: TokenType.String,
+			debugInfo: [line, col],
 			value
 		}
 	})
@@ -67,6 +73,7 @@ export function lex(input: string): Token[] {
 	registerToken(/\[\s*(.*?(?<!\\)(?:\\\\)*(?!\\))\]/, ([, value]) => {
 		return {
 			type: TokenType.Error,
+			debugInfo: [line, col],
 			value: value.trim()
 		}
 	})
@@ -75,49 +82,57 @@ export function lex(input: string): Token[] {
 
 	registerToken(/;/, () => {
 		return {
-			type: TokenType.Semicolon
+			type: TokenType.Semicolon,
+			debugInfo: [line, col]
 		}
 	})
 
 	registerToken(/\*/, () => {
 		return {
-			type: TokenType.Asterisk
+			type: TokenType.Asterisk,
+			debugInfo: [line, col]
 		}
 	})
 
 	registerToken(/\+/, () => {
 		return {
-			type: TokenType.Plus
+			type: TokenType.Plus,
+			debugInfo: [line, col]
 		}
 	})
 
 	registerToken(/\|/, () => {
 		return {
-			type: TokenType.Or
+			type: TokenType.Or,
+			debugInfo: [line, col]
 		}
 	})
 
 	registerToken(/{/, () => {
 		return {
-			type: TokenType.OpenBrace
+			type: TokenType.OpenBrace,
+			debugInfo: [line, col]
 		}
 	})
 
 	registerToken(/}/, () => {
 		return {
-			type: TokenType.CloseBrace
+			type: TokenType.CloseBrace,
+			debugInfo: [line, col]
 		}
 	})
 
 	registerToken(/\(/, () => {
 		return {
-			type: TokenType.OpenParen
+			type: TokenType.OpenParen,
+			debugInfo: [line, col]
 		}
 	})
 
 	registerToken(/\)/, () => {
 		return {
-			type: TokenType.CloseParen
+			type: TokenType.CloseParen,
+			debugInfo: [line, col]
 		}
 	})
 
@@ -126,7 +141,17 @@ export function lex(input: string): Token[] {
 		for (const [regex, callback] of callbacks) {
 			const m = nextChars.match(regex)
 			if (m) {
-				p += m[0].length
+				const whiteLength = m[0].length
+				const lastNewlineIndex = m[0].lastIndexOf("\n")
+
+				if (lastNewlineIndex) {
+					line += m[0].split("\n").length - 1
+					col = lastNewlineIndex
+				} else {
+					col += whiteLength
+				}
+
+				p += whiteLength
 				return callback(m)
 			}
 		}
