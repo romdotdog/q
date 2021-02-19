@@ -1,4 +1,4 @@
-import { Token, TokenType } from "./Token"
+import { Token, TokenType } from "./types/Token"
 
 export function lex(input: string): Token[] {
 	input = input.replace(/\r\n/g, "\n")
@@ -22,7 +22,7 @@ export function lex(input: string): Token[] {
 		callbacks.push([new RegExp(`^(?:${regex.source})`, regex.flags), callback])
 
 	// Identifier with colon
-	registerToken(/[a-zA-Z_]\w*:/, ([value]) => {
+	registerToken(/([a-zA-Z_]\w*):/, ([, value]) => {
 		return {
 			type: TokenType.Field,
 			value
@@ -30,7 +30,7 @@ export function lex(input: string): Token[] {
 	})
 
 	// Identifier that references a child
-	registerToken(/\$[a-zA-Z_]\w*/, ([value]) => {
+	registerToken(/\$([a-zA-Z_]\w*)/, ([, value]) => {
 		return {
 			type: TokenType.NestedIdentifier,
 			value
@@ -46,14 +46,18 @@ export function lex(input: string): Token[] {
 	})
 
 	// Note: /(?<!\\)(?:\\\\)*(?!\\)/ matches an even number of backslashes
-	registerToken(/\/.*?(?<!\\)(?:\\\\)*(?!\\)\/[gmiyus]*/, ([value]) => {
-		return {
-			type: TokenType.RegEx,
-			value
+	registerToken(
+		/\/(.*?(?<!\\)(?:\\\\)*(?!\\))\/([gmiyus]*)/,
+		([, source, flags]) => {
+			return {
+				type: TokenType.RegEx,
+				source,
+				flags
+			}
 		}
-	})
+	)
 
-	registerToken(/".*?(?<!\\)(?:\\\\)*(?!\\)"/, ([value]) => {
+	registerToken(/"(.*?(?<!\\)(?:\\\\)*(?!\\))"/, ([, value]) => {
 		return {
 			type: TokenType.String,
 			value

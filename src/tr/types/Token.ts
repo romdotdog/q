@@ -25,6 +25,11 @@ export interface Token {
 	type: TokenType
 }
 
-export interface VariableToken extends Token {
+export interface TokenLiteral extends Token {
 	value: string
+}
+
+export interface TokenRegEx extends Token {
+	source: string
+	flags: string
 }
