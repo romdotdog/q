@@ -54,7 +54,7 @@ declare module "transformat" {
 		gen: Generator
 	}
 
-	export function pattern(
+	export function q(
 		literals: TemplateStringsArray,
 		...placeholders: string[]
 	): Pattern
@@ -77,6 +77,7 @@ declare module "transformat" {
 	}
 
 	export interface GenericSyntax {
+		source: GenericToken[]
 		groups: GenericSyntax[]
 	}
 

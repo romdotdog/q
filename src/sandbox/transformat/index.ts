@@ -1,1 +1,1 @@
-export { pattern } from "../../pattern"
+export { pattern as q } from "../../pattern"

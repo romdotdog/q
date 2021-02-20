@@ -1,5 +1,5 @@
 // ext: .n
-import Block, { pattern } from "transformat"
+import Block, { q } from "transformat"
 
 export default <Block>{
 	lex: {
@@ -25,15 +25,15 @@ export default <Block>{
 	},
 
 	parse: {
-		root: pattern`expression`,
+		root: q`expression`,
 		ast: {
-			expression: pattern`o1 | primaryExpression`,
-			o1: pattern`<primaryExpression> -> <mul | div> -> <primaryExpression>`,
+			expression: q`o1 | primaryExpression`,
+			o1: q`<primaryExpression> -> <mul | div> -> <primaryExpression>`,
 
-			primaryExpression: pattern`parenExpr | negativeNumber | number`,
+			primaryExpression: q`parenExpr | negativeNumber | number`,
 
-			parenExpr: pattern`openingParenthesis -> <expression> -> closingParenthesis`,
-			negativeNumber: pattern`sub -> <number>`
+			parenExpr: q`openingParenthesis -> <expression> -> closingParenthesis`,
+			negativeNumber: q`sub -> <number>`
 		}
 	},
 
