@@ -34,8 +34,8 @@ declare module "transformat" {
 		ast: Record<string, Pattern>
 	}
 
-	type Visitor = (...groups: GenericSyntax[]) => void
-	type Serializer = (...groups: string[]) => string
+	type Visitor = (...groups: (GenericSyntax | null)[]) => void
+	type Serializer = (...groups: (string | null)[]) => string
 
 	interface Generator {
 		syntaxes: Record<

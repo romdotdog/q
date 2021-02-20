@@ -48,7 +48,7 @@ export class IdentifierLiteral extends Pattern {
 	): boolean {
 		if (identManager.isLex(this.value)) {
 			const [next] = tokenStream.splice(0, 1)
-			if (next.type == this.value) {
+			if (next && next.type == this.value) {
 				syntax.source.push(next)
 				return true
 			}
@@ -120,6 +120,7 @@ export class Group extends Pattern {
 			syntax.groups.push(nestedSyntax)
 			return true
 		}
+		syntax.groups.push(null)
 		return false
 	}
 }
@@ -149,12 +150,30 @@ export class BinOp extends Pattern {
 				let newStream: GenericToken[]
 				const lhsStream = tokenStream.slice()
 				const rhsStream = tokenStream.slice()
+
+				// Switch the added groups to null if lhs or rhs fails
+				let start = syntax.groups.length
+
+				const makeNull = () => {
+					const numberToNullize = syntax.groups.length - start
+					syntax.groups.splice(
+						start,
+						numberToNullize,
+						...(Array(numberToNullize).fill(null) as null[])
+					)
+				}
+
 				if (this.lhs.try(lhsStream, identManager, syntax)) {
 					newStream = lhsStream
-				} else if (this.rhs.try(rhsStream, identManager, syntax)) {
-					newStream = rhsStream
 				} else {
-					return false
+					makeNull()
+					start = syntax.groups.length
+					if (this.rhs.try(rhsStream, identManager, syntax)) {
+						newStream = rhsStream
+					} else {
+						makeNull()
+						return false
+					}
 				}
 
 				// switch streams in-place (hack)

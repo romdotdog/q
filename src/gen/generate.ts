@@ -21,14 +21,14 @@ export function buildGenerator(root: Block): (ast: GenericSyntax) => string {
 					syntaxVisitor.visit(...syntax.groups)
 				}
 
-				const groups = syntax.groups.map(traverse)
+				const groups = syntax.groups.map((g) => (g ? traverse(g) : g))
 				return syntaxVisitor.serialize(...groups)
 			}
 		}
 
 		return (syntax.groups.length === 0
 			? syntax.source.map((t) => t.source[0])
-			: syntax.groups.map(traverse)
+			: syntax.groups.filter((g): g is GenericSyntax => !!g).map(traverse)
 		).reduce(joiner, "")
 	}
 

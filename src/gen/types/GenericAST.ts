@@ -6,7 +6,7 @@ export interface GenericToken {
 
 export interface GenericSyntax {
 	source: GenericToken[]
-	groups: GenericSyntax[]
+	groups: (GenericSyntax | null)[]
 }
 
 export interface NamedGenericSyntax extends GenericSyntax {

@@ -18,9 +18,15 @@ export function buildParser(
 			source: []
 		}
 
+		console.log(root.parse.root)
 		if (root.parse.root.try(tokenStream, identManager, rootSyntax)) {
 			return rootSyntax
 		}
-		throw new Error("Unable to parse.")
+
+		throw new Error(
+			`Unable to parse. Next 10 tokens: ${tokenStream
+				.slice(0, 10)
+				.map((t) => `${t.type}<${t.source[0]}>`)}`
+		)
 	}
 }
