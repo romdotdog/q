@@ -42,7 +42,7 @@ declare module "transformat" {
 			string,
 			{
 				visit?: Visitor
-				serialize: Serializer
+				serialize?: Serializer
 			}
 		>
 		$joiner?: (accumulator: string, serializedSyntax: string) => string
@@ -77,6 +77,7 @@ declare module "transformat" {
 	}
 
 	export interface GenericSyntax {
+		type?: string
 		source: GenericToken[]
 		groups: GenericSyntax[]
 	}

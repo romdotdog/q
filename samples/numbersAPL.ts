@@ -1,5 +1,43 @@
 import Block, { q } from "transformat"
 
+const opConversion = {
+	"==": "=",
+	"!=": "≠",
+
+	"<=": "≤",
+	">=": "≥",
+
+	">": ">",
+	"<": "<",
+
+	"*": "×",
+	"/": "÷",
+
+	"+": "+",
+	"-": "-",
+
+	"^": "*"
+}
+
+const symmetricalOp = {
+	"=": false,
+	"≠": false,
+
+	"≤": ">",
+	"≥": "<",
+
+	">": "≤",
+	"<": "≥",
+
+	"×": false,
+	"÷": "÷⍨",
+
+	"+": false,
+	"-": "-⍨",
+
+	"*": "*⍨"
+}
+
 export default <Block>{
 	lex: {
 		whitespaceRegEx: /\s*/,
@@ -38,10 +76,10 @@ export default <Block>{
 		ast: {
 			expression: q`o4`,
 
-			o4: q`<o3> -> <eq | neq | g | l | ge | le> -> <o3> | <o3>`,
-			o3: q`<o2> -> <add | sub> -> <o2> | <o2>`,
-			o2: q`<o1> -> <mul | div> -> <o1> | <o1>`,
-			o1: q`<primaryExpression> -> exp -> <primaryExpression> | <primaryExpression>`,
+			o4: q`o3 -> (<eq | neq | g | l | ge | le> -> o3)*`,
+			o3: q`o2 -> (<add | sub> -> o2)*`,
+			o2: q`o1 -> (<mul | div> -> o1)*`,
+			o1: q`primaryExpression -> (exp -> primaryExpression)*`,
 
 			primaryExpression: q`parenExpr | negativeNumber | number`,
 
@@ -52,11 +90,18 @@ export default <Block>{
 
 	gen: {
 		syntaxes: {
+			o4: {
+				visit: (base, ...add) => {
+					console.log(add)
+				}
+			},
+
 			parenExpr: {
 				serialize: (expr) => {
 					return `(${expr})`
 				}
 			},
+
 			negativeNumber: {
 				serialize: (number) => {
 					return `-${number}`

@@ -44,7 +44,7 @@ interface Generator {
 		string,
 		{
 			visit?: Visitor
-			serialize: Serializer
+			serialize?: Serializer
 		}
 	>
 	$joiner?: (accumulator: string, serializedSyntax: string) => string

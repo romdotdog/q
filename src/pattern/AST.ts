@@ -75,6 +75,15 @@ export class IdentifierLiteral extends Pattern {
 	}
 }
 
+const makeNullToEnd = (start: number, groups: (GenericSyntax | null)[]) => {
+	const numberToNullize = groups.length - start
+	groups.splice(
+		start,
+		numberToNullize,
+		...(Array(numberToNullize).fill(null) as null[])
+	)
+}
+
 export class Parenthesis extends Pattern {
 	constructor(
 		public expr: Pattern,
@@ -92,7 +101,26 @@ export class Parenthesis extends Pattern {
 		identManager: IdentifierManager,
 		syntax: GenericSyntax
 	): boolean {
-		return this.expr.try(tokenStream, identManager, syntax)
+		const [start, end] = this.range
+
+		// Try greedily
+		let newStream = tokenStream
+		let successfulTries = 0
+		while (!end || successfulTries < end) {
+			const experimentalStream = newStream.slice()
+			const start = syntax.groups.length
+			if (this.expr.try(experimentalStream, identManager, syntax)) {
+				newStream = experimentalStream
+				successfulTries++
+			} else {
+				makeNullToEnd(start, syntax.groups)
+				break
+			}
+		}
+
+		// switch streams in-place (hack)
+		tokenStream.splice(0, tokenStream.length, ...newStream)
+		return successfulTries >= start
 	}
 }
 
@@ -154,24 +182,15 @@ export class BinOp extends Pattern {
 				// Switch the added groups to null if lhs or rhs fails
 				let start = syntax.groups.length
 
-				const makeNull = () => {
-					const numberToNullize = syntax.groups.length - start
-					syntax.groups.splice(
-						start,
-						numberToNullize,
-						...(Array(numberToNullize).fill(null) as null[])
-					)
-				}
-
 				if (this.lhs.try(lhsStream, identManager, syntax)) {
 					newStream = lhsStream
 				} else {
-					makeNull()
+					makeNullToEnd(start, syntax.groups)
 					start = syntax.groups.length
 					if (this.rhs.try(rhsStream, identManager, syntax)) {
 						newStream = rhsStream
 					} else {
-						makeNull()
+						makeNullToEnd(start, syntax.groups)
 						return false
 					}
 				}
