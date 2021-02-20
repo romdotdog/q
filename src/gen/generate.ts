@@ -1,9 +1,7 @@
-import { GenericSyntax, NamedGenericSyntax } from "transformat"
 import Block from "./Block"
+import { GenericSyntax } from "./types/GenericAST"
 
-export function buildGenerator(
-	root: Block
-): (ast: NamedGenericSyntax) => string {
+export function buildGenerator(root: Block): (ast: GenericSyntax) => string {
 	type MaybeNamedSyntax = GenericSyntax & { type?: string }
 
 	const syntaxes = root.gen.syntaxes
@@ -12,33 +10,27 @@ export function buildGenerator(
 		const joiner =
 			root.gen.$joiner ||
 			function (accumulator, serializedSyntax) {
+				if (accumulator.length == 0) return serializedSyntax
 				return accumulator + " " + serializedSyntax
 			}
 
 		if (syntax.type) {
 			const syntaxVisitor = syntaxes[syntax.type]
-			if (!syntaxVisitor) {
-				throw new Error(`Expected visitor for ${syntax.type}`)
-			}
+			if (syntaxVisitor) {
+				if (syntaxVisitor.visit) {
+					syntaxVisitor.visit(...syntax.groups)
+				}
 
-			if (syntaxVisitor.visit) {
-				syntaxVisitor.visit(...syntax.groups)
+				const groups = syntax.groups.map(traverse)
+				return syntaxVisitor.serialize(...groups)
 			}
-
-			const groups = syntax.groups.map(traverse)
-			return syntaxVisitor.serialize(...groups)
 		}
 
-		return syntax.groups
-			.map(traverse)
-			.reduce(
-				(accumulator, serializedSyntax) =>
-					joiner(accumulator, serializedSyntax),
-				""
-			)
+		return (syntax.groups.length === 0
+			? syntax.source.map((t) => t.source[0])
+			: syntax.groups.map(traverse)
+		).reduce(joiner, "")
 	}
 
-	return (ast: NamedGenericSyntax) => {
-		return traverse(ast)
-	}
+	return (ast: GenericSyntax) => traverse(ast)
 }

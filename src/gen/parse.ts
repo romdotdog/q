@@ -1,21 +1,22 @@
 import Block from "./Block"
 import { IdentifierManager } from "./identManager"
-import { GenericToken, NamedGenericSyntax } from "./types/GenericAST"
+import { GenericSyntax, GenericToken } from "./types/GenericAST"
 
 export function buildParser(
 	root: Block
-): (tokenStream: GenericToken[]) => NamedGenericSyntax {
+): (tokenStream: GenericToken[]) => GenericSyntax {
 	const identManager = new IdentifierManager(Object.keys(root.lex.tokens))
-	const rootSyntax: NamedGenericSyntax = {
-		type: "Root",
-		groups: []
-	}
 
 	for (const [name, pattern] of Object.entries(root.parse.ast)) {
 		identManager.add(name, pattern)
 	}
 
 	return (tokenStream: GenericToken[]) => {
+		const rootSyntax: GenericSyntax = {
+			groups: [],
+			source: []
+		}
+
 		if (root.parse.root.try(tokenStream, identManager, rootSyntax)) {
 			return rootSyntax
 		}

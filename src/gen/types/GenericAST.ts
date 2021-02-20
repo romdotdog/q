@@ -5,6 +5,7 @@ export interface GenericToken {
 }
 
 export interface GenericSyntax {
+	source: GenericToken[]
 	groups: GenericSyntax[]
 }
 
