@@ -13,7 +13,7 @@ export function buildParser(
 
 	return (tokenStream: GenericToken[]) => {
 		const rootSyntax: NamedGenericSyntax = {
-			type: "Root",
+			type: "root",
 			groups: [],
 			source: []
 		}
