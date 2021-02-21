@@ -18,7 +18,6 @@ export function buildParser(
 			source: []
 		}
 
-		console.log(root.parse.root)
 		if (root.parse.root.try(tokenStream, identManager, rootSyntax)) {
 			return rootSyntax
 		}

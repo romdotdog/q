@@ -36,8 +36,8 @@ interface Parser {
 	ast: Record<string, Pattern>
 }
 
-type Visitor = (...groups: (GenericSyntax | null)[]) => void
-type Serializer = (...groups: (string | null)[]) => string
+type Visitor = (groups: (GenericSyntax | null)[]) => void
+type Serializer = (groups: (string | null)[]) => string
 
 interface Generator {
 	syntaxes: Record<

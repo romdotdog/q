@@ -26,7 +26,7 @@ function parse(input: string): Pattern {
 				/([a-zA-Z_]\w*)/, // Identifier
 				/(->|\|)/, // Op
 				/(\()/, // OpenParenthesis
-				/(\)[+*]?)/, // CloseParenthesis with modifiers
+				/(\)[+*?]?)/, // CloseParenthesis with modifiers
 				/(<)/, // OpenAngleBracket
 				/(>)/ // CloseAngleBracket
 			)
@@ -79,6 +79,9 @@ function parse(input: string): Pattern {
 						break
 					case "+":
 						range = [1]
+						break
+					case "?":
+						range = [0, 1]
 						break
 				}
 

@@ -4,6 +4,18 @@ import { GenericSyntax } from "./types/GenericAST"
 export function buildGenerator(root: Block): (ast: GenericSyntax) => string {
 	const syntaxes = root.gen.syntaxes
 
+	const getGroupLength = (syntax: GenericSyntax) =>
+		syntax.groups.filter((_s): _s is GenericSyntax => !!_s).length
+
+	function simplify(syntax: GenericSyntax): GenericSyntax {
+		if (!syntax.type && getGroupLength(syntax) === 1) {
+			syntax = syntax.groups.find((s) => s) || syntax
+		}
+
+		syntax.groups = syntax.groups.map((g) => g && simplify(g))
+		return syntax
+	}
+
 	function traverse(syntax: GenericSyntax): string {
 		const joiner =
 			root.gen.$joiner ||
@@ -16,12 +28,12 @@ export function buildGenerator(root: Block): (ast: GenericSyntax) => string {
 			const syntaxVisitor = syntaxes[syntax.type]
 			if (syntaxVisitor) {
 				if (syntaxVisitor.visit) {
-					syntaxVisitor.visit(...syntax.groups)
+					syntaxVisitor.visit(syntax.groups)
 				}
 
 				if (syntaxVisitor.serialize) {
 					const groups = syntax.groups.map((g) => (g ? traverse(g) : g))
-					return syntaxVisitor.serialize(...groups)
+					return syntaxVisitor.serialize(groups)
 				}
 			}
 		}
@@ -32,5 +44,8 @@ export function buildGenerator(root: Block): (ast: GenericSyntax) => string {
 		).reduce(joiner, "")
 	}
 
-	return (ast: GenericSyntax) => traverse(ast)
+	return (ast: GenericSyntax) => {
+		simplify(ast)
+		return traverse(ast)
+	}
 }
