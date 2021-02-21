@@ -38,7 +38,8 @@ export function buildGenerator(root: Block): (ast: GenericSyntax) => string {
 						source: syntax.source
 					}
 
-					return syntaxVisitor.serialize(serializedSyntax)
+					const override = syntaxVisitor.serialize(serializedSyntax)
+					if (override) return override
 				}
 			}
 		}

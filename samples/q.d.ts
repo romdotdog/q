@@ -35,7 +35,7 @@ declare module "q" {
 	}
 
 	type Visitor = (syntax: GenericSyntax) => void
-	type Serializer = (syntax: SerializedGenericSyntax) => string
+	type Serializer = (syntax: SerializedGenericSyntax) => string | void
 
 	interface Generator {
 		syntaxes: Record<
