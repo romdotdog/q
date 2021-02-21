@@ -1,7 +1,6 @@
 import { cac } from "cac"
 import { readFile } from "fs/promises"
 import { buildLex as buildLexer } from "./gen/lex"
-import { join, dirname } from "path"
 import requireFromString from "require-from-string"
 import { buildParser } from "./gen/parse"
 import { buildGenerator } from "./gen/generate"
