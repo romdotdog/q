@@ -1,2 +1,2 @@
 @echo off
-npm start %*
+npm --prefix %~dp0 start %*

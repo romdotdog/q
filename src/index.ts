@@ -1,11 +1,11 @@
 import { cac } from "cac"
 import { readFile } from "fs/promises"
 import { buildLex as buildLexer } from "./gen/lex"
-import { join } from "path"
+import { join, dirname } from "path"
 import requireFromString from "require-from-string"
-import * as ts from "typescript"
 import { buildParser } from "./gen/parse"
 import { buildGenerator } from "./gen/generate"
+import { compile } from "./compiler"
 
 // https://stackoverflow.com/questions/30441025/read-all-text-from-stdin-to-a-string
 async function read(stream: NodeJS.ReadStream) {
@@ -18,13 +18,9 @@ const cli = cac("q")
 cli
 	.command("<q> [file]", "transform [file] or stdin using <q>")
 	.action(async (q: string, file?: string) => {
-		const Block = requireFromString(
-			ts.transpile(await readFile(q, { encoding: "utf-8" })),
-			q,
-			{
-				prependPaths: [join(__dirname, "sandbox")]
-			}
-		)
+		const Block = requireFromString(await compile(q))
+
+		console.log(Block)
 
 		if (!Block.default)
 			throw new Error("Expected `Block` as default export in q.")
