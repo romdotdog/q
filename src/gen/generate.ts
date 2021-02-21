@@ -1,5 +1,5 @@
 import Block from "./Block"
-import { GenericSyntax } from "./types/GenericAST"
+import { GenericSyntax, SerializedGenericSyntax } from "./types/GenericAST"
 
 export function buildGenerator(root: Block): (ast: GenericSyntax) => string {
 	const syntaxes = root.gen.syntaxes
@@ -28,12 +28,17 @@ export function buildGenerator(root: Block): (ast: GenericSyntax) => string {
 			const syntaxVisitor = syntaxes[syntax.type]
 			if (syntaxVisitor) {
 				if (syntaxVisitor.visit) {
-					syntaxVisitor.visit(syntax.groups)
+					syntaxVisitor.visit(syntax)
 				}
 
 				if (syntaxVisitor.serialize) {
-					const groups = syntax.groups.map((g) => (g ? traverse(g) : g))
-					return syntaxVisitor.serialize(groups)
+					const serializedSyntax: SerializedGenericSyntax = {
+						type: syntax.type,
+						groups: syntax.groups.map((g) => (g ? traverse(g) : g)),
+						source: syntax.source
+					}
+
+					return syntaxVisitor.serialize(serializedSyntax)
 				}
 			}
 		}

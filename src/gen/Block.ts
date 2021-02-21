@@ -1,5 +1,5 @@
 import { Pattern } from "../pattern/AST"
-import { GenericSyntax } from "./types/GenericAST"
+import { GenericSyntax, SerializedGenericSyntax } from "./types/GenericAST"
 
 /**
  * This interface provides a specification to tokenize text.
@@ -36,8 +36,8 @@ interface Parser {
 	ast: Record<string, Pattern>
 }
 
-type Visitor = (groups: (GenericSyntax | null)[]) => void
-type Serializer = (groups: (string | null)[]) => string
+type Visitor = (groups: GenericSyntax) => void
+type Serializer = (groups: SerializedGenericSyntax) => string
 
 interface Generator {
 	syntaxes: Record<

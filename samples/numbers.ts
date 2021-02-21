@@ -36,12 +36,12 @@ export default <Block>{
 	gen: {
 		syntaxes: {
 			parenExpr: {
-				serialize: (expr) => {
+				serialize: ({ groups: [expr] }) => {
 					return `(${expr})`
 				}
 			},
 			negativeNumber: {
-				serialize: (number) => {
+				serialize: ({ groups: [number] }) => {
 					return `-${number}`
 				}
 			}

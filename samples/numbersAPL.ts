@@ -83,11 +83,12 @@ function stripParenthesis(syntax: GenericSyntax): GenericSyntax {
 		: stripParenthesis(syntax.groups[0])
 }
 
-const operatorVisitor: Visitor = (group) => {
-	let lhs = group[0],
-		rhs = group[2]
+const operatorVisitor: Visitor = (syntax) => {
+	const groups = syntax.groups
+	let lhs = groups[0],
+		rhs = groups[2]
 
-	const op = group[1]
+	const op = groups[1]
 
 	if (lhs && op && rhs) {
 		lhs = stripParenthesis(getMeaningful(lhs))
@@ -111,7 +112,7 @@ const operatorVisitor: Visitor = (group) => {
 			}
 		}
 
-		group.splice(0, 3, lhs, op, rhs)
+		syntax.groups = [lhs, op, rhs]
 	}
 }
 
@@ -181,13 +182,13 @@ export default <Block>{
 			},
 
 			parenExpr: {
-				serialize: ([expr]) => {
+				serialize: ({ groups: [expr] }) => {
 					return `(${expr})`
 				}
 			},
 
 			negativeNumber: {
-				serialize: ([number]) => {
+				serialize: ({ groups: [number] }) => {
 					return `-${number}`
 				}
 			}

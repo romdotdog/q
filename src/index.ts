@@ -20,8 +20,6 @@ cli
 	.action(async (q: string, file?: string) => {
 		const Block = requireFromString(await compile(q))
 
-		console.log(Block)
-
 		if (!Block.default)
 			throw new Error("Expected `Block` as default export in q.")
 

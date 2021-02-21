@@ -3,8 +3,6 @@ import { basename, join, resolve } from "path"
 import webpack from "webpack"
 
 export function compile(q: string): Promise<string> {
-	console.log(`Compiling ${basename(q)}..`)
-
 	const outFile = basename(q).replace(/\.ts(x?)$/, ".js$1")
 	const compiler = webpack({
 		mode: "development",
@@ -39,7 +37,6 @@ export function compile(q: string): Promise<string> {
 			if (err) throw err
 
 			if (res) {
-				console.log(res.toString())
 				readFile(join("dist/", outFile), { encoding: "utf-8" }).then(resolve)
 			} else {
 				throw new Error("webpack.Stats is undefined.")

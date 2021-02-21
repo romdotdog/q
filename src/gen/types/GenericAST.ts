@@ -13,3 +13,7 @@ export interface GenericSyntax {
 export interface NamedGenericSyntax extends GenericSyntax {
 	type: string
 }
+
+export interface SerializedGenericSyntax extends Omit<GenericSyntax, "groups"> {
+	groups: (string | null)[]
+}
