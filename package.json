@@ -1,5 +1,5 @@
 {
-	"name": "transformat",
+	"name": "q",
 	"version": "0.0.1",
 	"description": "Experimental project to provide a markup to parse and transpile any kind of text",
 	"main": "build/src/index.js",
@@ -9,14 +9,14 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/romdotdog/transformat.git"
+		"url": "git+https://github.com/romdotdog/q.git"
 	},
 	"author": "",
 	"license": "MIT",
 	"bugs": {
-		"url": "https://github.com/romdotdog/transformat/issues"
+		"url": "https://github.com/romdotdog/q/issues"
 	},
-	"homepage": "https://github.com/romdotdog/transformat#readme",
+	"homepage": "https://github.com/romdotdog/q#readme",
 	"devDependencies": {
 		"@typescript-eslint/eslint-plugin": "^4.15.1",
 		"@typescript-eslint/parser": "^4.15.1",

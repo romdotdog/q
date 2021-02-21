@@ -1,6 +1,6 @@
 // transforms an extended numbers dialect into APL while simulaneously reordering operators
 
-import Block, { GenericSyntax, q, Visitor } from "transformat"
+import Block, { GenericSyntax, q, Visitor } from "q"
 // Order of Operations are right to left in APL without exception
 
 // ((0.5 * 4 * 10.0 + 5) / 5 == 10) - 45

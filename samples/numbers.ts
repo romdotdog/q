@@ -1,5 +1,5 @@
 // ext: .n
-import Block, { q } from "transformat"
+import Block, { q } from "q"
 
 export default <Block>{
 	lex: {

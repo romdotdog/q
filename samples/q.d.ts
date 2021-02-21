@@ -1,4 +1,4 @@
-declare module "transformat" {
+declare module "q" {
 	/**
 	 * This interface provides a specification to tokenize text.
 	 */

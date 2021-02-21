@@ -14,23 +14,20 @@ async function read(stream: NodeJS.ReadStream) {
 	return Buffer.concat(chunks).toString("utf8")
 }
 
-const cli = cac("transformat")
+const cli = cac("q")
 cli
-	.command(
-		"<transformat> [file]",
-		"transform [file] or stdin using <transformat>"
-	)
-	.action(async (transformat: string, file?: string) => {
+	.command("<q> [file]", "transform [file] or stdin using <q>")
+	.action(async (q: string, file?: string) => {
 		const Block = requireFromString(
-			ts.transpile(await readFile(transformat, { encoding: "utf-8" })),
-			transformat,
+			ts.transpile(await readFile(q, { encoding: "utf-8" })),
+			q,
 			{
 				prependPaths: [join(__dirname, "sandbox")]
 			}
 		)
 
 		if (!Block.default)
-			throw new Error("Expected `Block` as default export in transformat.")
+			throw new Error("Expected `Block` as default export in q.")
 
 		const str = file
 			? await readFile(file, { encoding: "utf8" })
