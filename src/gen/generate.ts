@@ -24,6 +24,7 @@ export function buildGenerator(root: Block): (ast: GenericSyntax) => string {
 				return accumulator + " " + serializedSyntax
 			}
 
+		let serializedSyntax: SerializedGenericSyntax | undefined = undefined
 		if (syntax.type) {
 			const syntaxVisitor = syntaxes[syntax.type]
 			if (syntaxVisitor) {
@@ -32,7 +33,7 @@ export function buildGenerator(root: Block): (ast: GenericSyntax) => string {
 				}
 
 				if (syntaxVisitor.serialize) {
-					const serializedSyntax: SerializedGenericSyntax = {
+					serializedSyntax = {
 						type: syntax.type,
 						groups: syntax.groups.map((g) => (g ? traverse(g) : g)),
 						source: syntax.source
@@ -44,10 +45,13 @@ export function buildGenerator(root: Block): (ast: GenericSyntax) => string {
 			}
 		}
 
-		return (syntax.groups.length === 0
-			? syntax.source.map((t) => t.source[0])
+		return (syntax.groups.length === 0 // if this doesn't have child groups,
+			? syntax.source.map((t) => t.source[0]) // use the token.
+			: serializedSyntax // else if this was already serialized
+			? serializedSyntax.groups.filter((g): g is string => !!g) // use the serialized syntax
 			: syntax.groups.filter((g): g is GenericSyntax => !!g).map(traverse)
-		).reduce(joiner, "")
+		) // otherwise serialize the current group
+			.reduce(joiner, "")
 	}
 
 	return (ast: GenericSyntax) => {
