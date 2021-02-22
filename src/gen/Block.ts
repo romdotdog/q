@@ -11,6 +11,11 @@ interface Lexer {
 	whitespaceRegEx?: RegExp
 
 	/**
+	 * An optional iconv encoding to decode with.
+	 */
+	encoding?: string
+
+	/**
 	 * Throws an error with this string if the lexer cannot tokenize
 	 */
 	throw?: string

@@ -18,7 +18,10 @@ export function buildParser(
 			source: []
 		}
 
-		if (root.parse.root.try(tokenStream, identManager, rootSyntax)) {
+		if (
+			root.parse.root.try(tokenStream, identManager, rootSyntax) &&
+			tokenStream.length === 0
+		) {
 			return rootSyntax
 		}
 
