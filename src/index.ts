@@ -19,6 +19,7 @@ cli
 	.command("<q> [file]", "transform [file] using <q>")
 	.action(async (q: string, file: string) => {
 		const Block = requireFromString(await compile(q))
+		console.log("Bundled.")
 
 		if (!Block.default)
 			throw new Error("Expected `Block` as default export in q.")
@@ -29,7 +30,9 @@ cli
 		)
 
 		const tokenStream = buildLexer(Block.default)(str)
+		console.log("Tokenized.")
 		const ast = buildParser(Block.default)(tokenStream)
+		console.log("Parsed.")
 		console.log(buildGenerator(Block.default)(ast))
 	})
 
