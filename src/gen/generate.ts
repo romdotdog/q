@@ -29,7 +29,12 @@ export function buildGenerator(root: Block): (ast: GenericSyntax) => string {
 			const syntaxVisitor = syntaxes[syntax.type]
 			if (syntaxVisitor) {
 				if (syntaxVisitor.visit) {
-					syntaxVisitor.visit(syntax)
+					try {
+						syntaxVisitor.visit(syntax)
+					} catch (e) {
+						console.log(`Error while visiting ${syntax.type}`)
+						throw e
+					}
 				}
 
 				if (syntaxVisitor.serialize) {
@@ -39,8 +44,13 @@ export function buildGenerator(root: Block): (ast: GenericSyntax) => string {
 						source: syntax.source
 					}
 
-					const override = syntaxVisitor.serialize(serializedSyntax)
-					if (override) return override
+					try {
+						const override = syntaxVisitor.serialize(serializedSyntax)
+						if (override) return override
+					} catch (e) {
+						console.log(`Error while serializing ${syntax.type}`)
+						throw e
+					}
 				}
 			}
 		}
